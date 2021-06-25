@@ -9,6 +9,10 @@ import {Button} from '../../components/Button'
 import {useAuth} from '../../hooks/useAuth'
 import { FormEvent, useState } from 'react';
 import { database } from '../../services/firebase';
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
+
+const newSwal = withReactContent(Swal)
 
 export function Home(){
     const history = useHistory();
@@ -29,6 +33,16 @@ export function Home(){
 
         if (!roomRef.exists()){
             alert('A sala não existe.');
+            return;
+        }
+        if (roomRef.val().endedAt){
+            newSwal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Esta sala já foi encerrada!',
+                timer: 3500,
+                timerProgressBar: true
+              })
             return;
         }
         history.push(`/rooms/${roomCode}`);
