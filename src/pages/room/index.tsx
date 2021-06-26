@@ -19,7 +19,7 @@ type RoomParams = {
 
 
 export function Room(){
-    const {user} = useAuth()
+    const {user, signInWithGoogle} = useAuth()
     const roomParams = useParams<RoomParams>()
     const roomId = roomParams.id;
     const [newQuestion, setNewQuestion] = useState('')
@@ -28,7 +28,6 @@ export function Room(){
     
 
     
-
     async function handleSendQuestion(event: FormEvent){
         event.preventDefault();
         if (newQuestion.trim() === '') return;
@@ -84,7 +83,7 @@ export function Room(){
                                     <span>{user.name}</span>
                                 </div>
                             ) : (
-                                <span>Para enviar uma pergunta, <button>faça seu login</button>.</span>)
+                                <span>Para enviar uma pergunta, <button onClick={e => signInWithGoogle()}>faça seu login</button>.</span>)
                             }
                             <Button type="submit" disabled={!user}>Enviar pergunta</Button>
                         </div>

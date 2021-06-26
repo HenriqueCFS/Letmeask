@@ -67,6 +67,19 @@ export function useRoom(roomId: string, setLoading?: any){
                     likeId: Object.entries(value.likes ?? {}).find(([key,like]) => like.authorId === user?.id)?.[0]
                 }
             })
+            parsedQuestions.sort((a, b) => {
+                if (a.likeCount < b.likeCount) {
+                  return 1;
+                }
+                if (a.likeCount > b.likeCount) {
+                  return -1;
+                }
+                // a must be equal to b
+                return 0;
+              });
+
+
+
             setTitle(databaseRoom.title)
             setQuestions(parsedQuestions)
             setLoading?.(false);
