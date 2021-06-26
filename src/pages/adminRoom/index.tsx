@@ -76,8 +76,12 @@ export function AdminRoom(){
         await database.ref(`rooms/${roomId}`).update({
             endedAt: new Date(),
         });
-
-        history.push('/')
+        
+        const location = {
+            pathname: '/',
+            state: { fromRoomClosed: true }
+        }
+        history.push(location)
     }
 
     if (loading) return(<Loader />)

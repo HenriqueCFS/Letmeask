@@ -1,4 +1,4 @@
-import {useHistory} from 'react-router-dom';
+import {useHistory, useLocation} from 'react-router-dom';
 
 import illustrationImg from '../../assets/images/illustration.svg'
 import logoImg from '../../assets/images/logo.svg'
@@ -12,12 +12,28 @@ import { database } from '../../services/firebase';
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 
+type LocationState = {
+    fromRoomClosed: boolean
+}
+
 const newSwal = withReactContent(Swal)
 
 export function Home(){
     const history = useHistory();
     const {user, signInWithGoogle} = useAuth();
     const [roomCode, setRoomCode] = useState('');
+    const location = useLocation<LocationState>()
+    const { fromRoomClosed } = location.state || false;
+    
+    if (fromRoomClosed){
+        newSwal.fire({
+            icon: 'error',
+            title: 'Sala encerrada.',
+            text: 'Esta sala já foi encerrada!',
+            timer: 1000,
+            timerProgressBar: true,
+          })
+    }
    
     async function handleCreateRoom(){
         if (!user) {

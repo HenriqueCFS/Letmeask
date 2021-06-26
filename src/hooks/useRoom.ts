@@ -43,6 +43,13 @@ export function useRoom(roomId: string, setLoading?: any){
         roomRef.on('value', room =>{
             const databaseRoom = room.val();
             const firebaseQuestions: FirebaseQuestions = databaseRoom.questions ?? {};
+            if(databaseRoom.endedAt){
+                const location = {
+                    pathname: '/',
+                    state: { fromRoomClosed: true }
+                }
+                history.push(location)
+            }
             let amIAuthor = databaseRoom.authorId === user?.id
             
             if (location.includes('admin') && !amIAuthor){
