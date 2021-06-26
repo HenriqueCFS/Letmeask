@@ -31,6 +31,7 @@ type FirebaseQuestions = Record<string, {
 }>
 
 
+
 export function useRoom(roomId: string, setLoading?: any){
     const [questions, setQuestions] = useState<QuestionType[]>([])
     const [title, setTitle] = useState('')
@@ -44,24 +45,26 @@ export function useRoom(roomId: string, setLoading?: any){
             const databaseRoom = room.val();
             const firebaseQuestions: FirebaseQuestions = databaseRoom.questions ?? {};
             if(databaseRoom.endedAt){
-                const location = {
+                const redirectTo = {
                     pathname: '/',
                     state: { fromRoomClosed: true }
                 }
-                history.push(location)
+                history.push(redirectTo)
             }
-            let amIAuthor = databaseRoom.authorId === user?.id
+            if (databaseRoom.authorId && user?.id){
+                let amIAuthor = databaseRoom.authorId === user?.id
             
-            if (location.includes('admin') && !amIAuthor){
-                roomRef.off('value')
-                history.push(`/rooms/${roomId}`)
-                
-            }
-            if (!location.includes('admin') && amIAuthor){
-                roomRef.off('value')
-                console.log(location, amIAuthor)
-                history.push(`/admin/rooms/${roomId}`)
-                
+                if (location.includes('admin') && !amIAuthor){
+                    roomRef.off('value')
+                    history.push(`/rooms/${roomId}`)
+                    
+                }
+                if (!location.includes('admin') && amIAuthor){
+                    roomRef.off('value')
+                    console.log(location, amIAuthor)
+                    history.push(`/admin/rooms/${roomId}`)
+                    
+                }
             }
             const parsedQuestions = Object.entries(firebaseQuestions).map(([key, value]) => {
                 return{

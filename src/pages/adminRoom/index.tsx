@@ -77,11 +77,11 @@ export function AdminRoom(){
             endedAt: new Date(),
         });
         
-        const location = {
+        const redirectTo = {
             pathname: '/',
             state: { fromRoomClosed: true }
         }
-        history.push(location)
+        history.push(redirectTo)
     }
 
     if (loading) return(<Loader />)
