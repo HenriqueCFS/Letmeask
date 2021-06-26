@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { useHistory, useLocation } from "react-router-dom"
 import { database } from "../services/firebase"
 import { useAuth } from "./useAuth"
 
@@ -30,17 +31,31 @@ type FirebaseQuestions = Record<string, {
 }>
 
 
-export function useRoom(roomId: string){
+export function useRoom(roomId: string, setLoading?: any){
     const [questions, setQuestions] = useState<QuestionType[]>([])
     const [title, setTitle] = useState('')
     const {user} = useAuth()
+    const history = useHistory()
+    const location = useLocation().pathname.toLocaleLowerCase()
 
     useEffect(() => {
         const roomRef = database.ref(`rooms/${roomId}`)
-
         roomRef.on('value', room =>{
             const databaseRoom = room.val();
             const firebaseQuestions: FirebaseQuestions = databaseRoom.questions ?? {};
+            let amIAuthor = databaseRoom.authorId === user?.id
+            
+            if (location.includes('admin') && !amIAuthor){
+                roomRef.off('value')
+                history.push(`/rooms/${roomId}`)
+                
+            }
+            if (!location.includes('admin') && amIAuthor){
+                roomRef.off('value')
+                console.log(location, amIAuthor)
+                history.push(`/admin/rooms/${roomId}`)
+                
+            }
             const parsedQuestions = Object.entries(firebaseQuestions).map(([key, value]) => {
                 return{
                     id: key,
@@ -54,12 +69,12 @@ export function useRoom(roomId: string){
             })
             setTitle(databaseRoom.title)
             setQuestions(parsedQuestions)
-
+            setLoading?.(false);
             return () => {
                 roomRef.off('value')
             }
             
         })
-    }, [roomId, user?.id])
+    }, [roomId, user?.id, history, location, setLoading ])
     return {questions, title}
 }

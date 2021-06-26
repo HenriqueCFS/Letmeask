@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { NavLink, useParams } from 'react-router-dom';
 import logoImg from '../../assets/images/logo.svg';
 import deleteImg from '../../assets/images/delete.svg'
 import checkImg from '../../assets/images/check.svg'
@@ -6,13 +6,14 @@ import answerImg from '../../assets/images/answer.svg'
 import { Button } from '../../components/Button';
 import { Question } from '../../components/Question';
 import { RoomCode } from '../../components/RoomCode';
-//import { useAuth } from '../../hooks/useAuth';
 import { useRoom } from '../../hooks/useRoom';
 import { database } from '../../services/firebase'
 import './styles.scss';
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import { useHistory } from 'react-router-dom'
+import { useState } from 'react';
+import { Loader } from '../../components/Loader';
 
 const newSwal = withReactContent(Swal)
 
@@ -25,12 +26,11 @@ type RoomParams = {
 
 
 export function AdminRoom(){
-    //const {user} = useAuth()
     const history = useHistory();
     const roomParams = useParams<RoomParams>();
     const roomId = roomParams.id;
-    const {title, questions} = useRoom(roomId);
-
+    const [loading, setLoading] = useState(true)
+    const {title, questions} = useRoom(roomId, setLoading)
     function handleDeleteQuestion(questionId: string){
 
         newSwal.fire({
@@ -80,16 +80,17 @@ export function AdminRoom(){
         history.push('/')
     }
 
-    
-
-    return(
-        <div id="page-room">
+    if (loading) return(<Loader />)
+    else return(
+        <div id="page-room" className={loading ? 'hidden' : ''}>
             <header>
                 <div className="content">
-                    <img src={logoImg} alt="Letmeask" />
+                <NavLink to="/"><img src={logoImg} alt="Letmeask" /></NavLink>
                     <div>
                         <RoomCode code={roomId}/>
-                        <Button isOutlined onClick={()=>handleEndRoom()}>Encerrar Sala</Button>
+                        {!loading && (
+                            <Button isOutlined onClick={()=>handleEndRoom()}>Encerrar Sala</Button>
+                        )}
                     </div>
                 </div>
             </header>
